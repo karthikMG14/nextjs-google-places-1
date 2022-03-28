@@ -3,12 +3,16 @@ import { useRouter } from 'next/router'
 import {
   useLoadScript,
   Autocomplete,
-} from '@react-google-maps/api'
-
+} from '@react-google-maps/api';
+import axios from 'axios';
+import {useSelector,useDispatch} from 'react-redux'
+import {getMapLocation} from "../redux/maps/mapSlice";
 const scriptOptions = {
-  googleMapsApiKey: process.env.NEXT_PUBLIC_API_KEY,
+  googleMapsApiKey: "AIzaSyCn7YgQgOtNoSwAXJ_OQ-urMB5oNVq73cM",
   libraries: ['places'],
 }
+
+
 
 export default function SearchForm({ action }) {
   const router = useRouter();
@@ -16,9 +20,12 @@ export default function SearchForm({ action }) {
   const [autocomplete, setAutocomplete] = useState(null)
   const inputEl = useRef(null)
 
-  // Handle the keypress for input
+  let locationData = useSelector((state) => state.mapsData)
+  let dispatch =  useDispatch()
+
+  console.log(locationData.data)
+
   const onKeypress = (e) => {
-    // On enter pressed
     if (e.key === 'Enter') {
       e.preventDefault()
       return false
@@ -37,10 +44,13 @@ export default function SearchForm({ action }) {
     if (autocomplete) {
       const place = autocomplete.getPlace()
       if ('place_id' in place) {
-        router.push(`/place/${place.place_id}`)
+        dispatch(getMapLocation({place:place}))
       }
     }
   }
+
+  React.useEffect(() => {
+  },[dispatch,locationData.data])
 
   return (
     <div className="bg-white shadow p-10 rounded">
@@ -70,6 +80,10 @@ export default function SearchForm({ action }) {
           </form>
         </React.Fragment>
       ) }
+
+      <div style={{marginTop:'1em'}}>
+            <iframe src={`https://maps.google.com/maps?q=${locationData.data.lat},${locationData.data.lng}&output=embed`} width={'100%'} height={450} style={{border:0}} allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
     </div>
   )
 }

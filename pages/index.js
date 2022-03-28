@@ -4,6 +4,7 @@ import Layout from '../components/layout'
 
 export default function TestPage() {
   return (
+    
     <Layout>
       <Head>
         <title>Search Place</title>
